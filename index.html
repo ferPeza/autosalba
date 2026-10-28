@@ -113,6 +113,7 @@ footer{background:var(--hd);color:#ffffffb0;margin-top:30px}
  <button class="sec" id="bOut" style="display:none">Salir</button>
 </div></header>
 <main>
+ <div id="gate" style="display:none;text-align:center;padding:60px 0"><h2>Acceso administrador</h2><button id="bGate">Iniciar sesión</button></div>
  <section id="vSitio">
   <div class="carousel" id="car"></div>
   <h3 class="sec">Búsqueda rápida</h3>
@@ -130,7 +131,7 @@ footer{background:var(--hd);color:#ffffffb0;margin-top:30px}
   <div id="tAutos"></div><div id="tPromos" style="display:none"></div><div id="tAjustes" style="display:none"></div>
  </section>
 </main>
-<footer><div class="fw"><div><b>Autos Alba</b><span>Compra · Vende · Estrena</span></div><div><b>Contacto</b><span id="fTel">Pregunta por nuestras promociones</span></div></div>© Autos Alba · Todos los derechos reservados<div style="margin-top:8px"><a href="#" id="bLogin" style="color:inherit;opacity:.6;font-size:.75rem">Acceso administrador</a></div></footer>
+<footer><div class="fw"><div><b>Autos Alba</b><span>Compra · Vende · Estrena</span></div><div><b>Contacto</b><span id="fTel">Pregunta por nuestras promociones</span></div></div>© Autos Alba · Todos los derechos reservados<a href="#" id="bLogin" style="display:none"></a></footer>
 <div class="modal" id="modal"><div class="mb" id="mb"></div></div>
 <script>
 "use strict";
@@ -159,11 +160,13 @@ function ready(){
   d.doc("config/site").onSnapshot(function(s){cfg=s.exists?s.data():{};render()},function(){});
 }
 function render(){
+  var gate=$("#gate");if(gate)gate.style.display=MODE==="admin"&&!canAdmin?"":"none";
+  if(MODE==="admin"&&!canAdmin){$("#vSitio").style.display="none";$("#vAdmin").style.display="none";$("#bAdmin").style.display="none";$("#bSitio").style.display="none";$("#bOut").style.display="none";return}
   $("#vSitio").style.display=view==="sitio"?"":"none";
   $("#vAdmin").style.display=view==="admin"?"":"none";
   $("#bAdmin").style.display=canAdmin&&view==="sitio"?"":"none";
   $("#bSitio").style.display=canAdmin&&view==="admin"?"":"none";
-  $("#bOut").style.display=canAdmin?"":"none";$("#bLogin").style.display=canAdmin?"none":"";
+  $("#bOut").style.display=MODE==="admin"&&canAdmin?"":"none";$("#bLogin").style.display="none";
   if(view==="sitio"){renderCarousel();renderGrid()}else renderAdmin();
 }
 function slides(){
@@ -333,7 +336,7 @@ function adminAjustes(){
   var r=$("#tAjustes");r.textContent="";var d=Object.assign({},cfg);
   r.appendChild(el("div",{class:"panel"},[fld("WhatsApp de contacto (con lada, ej. 5218661234567)","whatsapp",d),el("button",{text:"Guardar",style:"margin-top:12px",on:{click:function(){db.doc("config/site").set(d).then(function(){alert("Guardado")})}}})]));
 }
-var CFG=window.APP_CONFIG||{},sb=null;
+var MODE=window.APP_MODE||"public",CFG=window.APP_CONFIG||{},sb=null;
 var COLS={cars:["marca","modelo","anio","precio","promo","km","transmision","combustible","color","categoria","asientos","puertas","maletas","descripcion","fotos","nuevo","vendido"],promos:["titulo","texto","foto","orden","activa"]};
 function pick(t,d,full){var o={};COLS[t].forEach(function(k){if(d[k]!==undefined&&d[k]!=="")o[k]=d[k];else if(full)o[k]=null});return o}
 function ck(r){if(r.error)throw r.error;return r.data}
@@ -346,7 +349,8 @@ function loginUI(){
       canAdmin=true;view="admin";closeM();render()}).catch(function(e){msg.textContent="No se pudo entrar: "+(e.message||e)})}}});
   var mb=$("#mb");mb.textContent="";[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("h3",{text:"Acceso administrador",style:"margin-top:0"}),em,pw,go,msg].forEach(function(k){mb.appendChild(k)});$("#modal").classList.add("on");
 }
-$("#bLogin").onclick=function(e){e.preventDefault();if(sb)loginUI()};
+$("#bLogin").onclick=function(e){e.preventDefault()};
+$("#bGate").onclick=function(){if(sb)loginUI()};
 $("#bOut").onclick=function(){sb.auth.signOut().then(function(){canAdmin=false;view="sitio";render()})};
 if(!CFG.url||String(CFG.url).indexOf("http")!==0){showErr("Falta configurar config.js");render()}
 else{
@@ -365,6 +369,6 @@ else{
   assets={upload:function(blob){var path=Date.now()+"-"+Math.random().toString(36).slice(2)+".jpg";
     return sb.storage.from("fotos").upload(path,blob,{contentType:"image/jpeg"}).then(function(r){if(r.error)throw r.error;return{url:sb.storage.from("fotos").getPublicUrl(path).data.publicUrl}})}};
   ready();render();
-  sb.auth.getSession().then(function(r){if(!r.data.session)return false;return sb.rpc("is_admin").then(function(x){return x.data===true})}).then(function(a){canAdmin=!!a;render()}).catch(function(){});
+  if(MODE==="admin")sb.auth.getSession().then(function(r){if(!r.data.session)return false;return sb.rpc("is_admin").then(function(x){return x.data===true})}).then(function(a){canAdmin=!!a;if(a)view="admin";render();if(!a)loginUI()}).catch(function(){});
 }
 </script></body></html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Autos Alba · Administrador</title>
+<meta name="robots" content="noindex">
+<script>window.APP_MODE="admin"</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<style>
+:root{--bg:#fff;--card:#fff;--tx:#14213d;--mu:#5c677d;--ac:#c1121f;--bd:#e3e6ea;--hd:#14213d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+header{background:var(--hd);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.hw{max-width:1100px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;flex:1;min-width:200px}
+.logo svg{width:46px;height:46px;flex:none}
+.logo b{font-size:1.6rem;letter-spacing:.5px}.logo b span{color:#ff4d5a}
+.logo small{display:block;font-size:.72rem;opacity:.75;letter-spacing:2px;text-transform:uppercase}
+button,.btn{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:9px 14px;background:var(--ac);color:#fff;font-weight:600}
+button.sec{background:transparent;color:inherit;border:1px solid var(--bd)}
+header button.sec{color:#fff;border-color:#ffffff55}
+button.danger{background:#7a0c14}
+main{max-width:1100px;margin:auto;padding:16px}
+body{overflow-x:hidden}
+.carousel{position:relative;width:100vw;margin:-16px 0 0 calc(50% - 50vw);border-radius:0;overflow:hidden;background:var(--hd);color:#fff;aspect-ratio:16/5;max-height:520px;min-height:210px}
+.slide{position:absolute;inset:0;display:flex;align-items:flex-end;opacity:0;transition:opacity .6s;background-size:cover;background-position:center}
+.slide.on{opacity:1}
+.slide .tx{padding:18px 22px 34px;width:100%;background:linear-gradient(transparent,#000c)}
+.slide h2{margin:0 0 4px;font-size:clamp(1.1rem,3.5vw,2rem)}
+.slide p{margin:0;font-size:clamp(.85rem,2.2vw,1.05rem);opacity:.92}
+.tag{display:inline-block;background:var(--ac);color:#fff;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-bottom:6px;text-transform:uppercase}
+.nav{position:absolute;top:50%;transform:translateY(-50%);background:#0008;padding:8px 12px;border-radius:50%;z-index:2}
+.nav.l{left:8px}.nav.r{right:8px}
+.dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}
+.dots i{width:9px;height:9px;border-radius:50%;background:#fff6;cursor:pointer}.dots i.on{background:#fff}
+h3.sec{margin:26px 0 10px;font-size:1.3rem}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+input,select,textarea{font:inherit;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx);width:100%}
+.filters input,.filters select{width:auto;flex:1;min-width:140px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.car{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column}
+.car .ph{aspect-ratio:4/3;background:var(--bd) center/cover no-repeat;position:relative}
+.car .bd{padding:12px}
+.car h4{margin:0 0 4px;font-size:1.05rem}
+.sp{color:var(--mu);font-size:.85rem}
+.pr{font-size:1.25rem;font-weight:800;color:var(--ac);margin-top:6px}
+.pr s{color:var(--mu);font-weight:400;font-size:.9rem;margin-right:6px}
+.badges{position:absolute;top:8px;left:8px;display:flex;gap:4px;flex-wrap:wrap}
+.badges span{background:var(--ac);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.badges span.v{background:#555}.badges span.n{background:#0a7d3b}
+.empty{color:var(--mu);text-align:center;padding:30px}
+.modal{position:fixed;inset:0;background:#000b;z-index:20;display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
+.modal.on{display:flex}
+.mb{background:var(--card);border-radius:14px;max-width:760px;width:100%;padding:16px;position:relative}
+.mb .x{position:absolute;right:10px;top:10px;background:#0009;z-index:2}
+.gal img.big{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:var(--bd)}
+.th{display:flex;gap:6px;margin-top:6px;overflow-x:auto}
+.th img{width:70px;height:54px;object-fit:cover;border-radius:6px;cursor:pointer;opacity:.6;flex:none}.th img.on{opacity:1;outline:2px solid var(--ac)}
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}
+.specs div{background:#f4f5f7;padding:8px;border-radius:8px;font-size:.88rem}.specs b{display:block;color:var(--mu);font-size:.72rem;text-transform:uppercase}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:16px}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button.on{background:var(--ac);color:#fff}.tabs button{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label{font-size:.8rem;color:var(--mu);display:block}
+.fotos{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.fotos div{position:relative}.fotos img{width:92px;height:70px;object-fit:cover;border-radius:8px}
+.fotos div button{position:absolute;top:2px;right:2px;padding:0 6px;font-size:.8rem;background:#000a}
+.row{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--bd);flex-wrap:wrap}
+.row img{width:64px;height:48px;object-fit:cover;border-radius:6px;background:var(--bd)}
+.row .t{flex:1;min-width:150px}
+.row button{padding:6px 10px;font-size:.85rem}
+.note{font-size:.85rem;color:var(--mu)}
+footer{text-align:center;color:var(--mu);font-size:.8rem;padding:24px}
+.hero{background:linear-gradient(135deg,var(--hd),#7a0c14);color:#fff;border-radius:14px;padding:28px 22px;margin-bottom:14px}
+.hero h1{margin:0 0 6px;font-size:clamp(1.5rem,5vw,2.6rem)}.hero p{margin:0;opacity:.85}
+.perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:30px}
+.perks div{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;color:var(--mu);font-size:.9rem}.perks b{display:block;color:var(--tx);font-size:1.05rem;margin-bottom:4px}
+footer{background:var(--hd);color:#ffffffb0;margin-top:30px}
+.fw{max-width:1100px;margin:0 auto 14px;display:flex;justify-content:space-around;gap:20px;flex-wrap:wrap;text-align:left}.fw b{display:block;color:#fff}
+.cath{display:flex;align-items:center;justify-content:space-between;margin:26px 0 10px}
+.cath h3{margin:0;font-size:1.5rem}.cath h3 small{color:var(--ac);font-size:.95rem;font-weight:400;margin-left:8px}
+.arr{display:flex;gap:6px}.arr button{background:var(--card);color:var(--mu);border:1px solid var(--bd);padding:6px 16px;font-size:1.2rem}
+.track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+.track::-webkit-scrollbar{display:none}
+.track .car{flex:0 0 calc((100% - 32px)/3);min-width:250px;scroll-snap-align:start}
+.car .bd{padding:16px}.car .yr{color:var(--mu);font-size:.85rem}
+.car .ic{display:flex;gap:14px;flex-wrap:wrap;color:var(--mu);font-size:.85rem;margin:10px 0 0}
+.car .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+.car .pr{margin:0;color:var(--tx)}
+.mas{background:#1a2f6e;color:#fff;padding:10px 18px;border-radius:4px;font-weight:600;font-size:.9rem;white-space:nowrap}
+.car{border:0;box-shadow:0 1px 4px #0001;border-radius:2px}
+.car .ph{background-color:#fff;background-size:contain}
+.car .bd{padding:22px 20px}.car h4{font-size:1.2rem;font-weight:600;margin:0}
+.car .yr{color:#8a929c;margin-top:2px}
+.car .av{font-size:.88rem;color:#8a929c;margin-top:6px}.car .av span{color:#2e9a3a}.car .av.no span{color:#b3261e}
+.car .ic{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;color:var(--tx);font-size:.9rem}
+.car .ic .i{display:inline-flex;align-items:center;gap:6px}.car .ic svg{width:20px;height:20px;fill:#9aa3ad}
+.car .foot{margin-top:20px}.car .pr{font-size:1.5rem;color:#0b1f5c}
+.mas{background:#0b1f5c;border-radius:2px;padding:16px 34px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .car .pr{color:var(--tx)}}
+.arr button{background:#f3f4f6;border:0;border-radius:0;padding:14px 20px}
+.arr svg{width:10px;height:17px;display:block}.arr .fl svg{transform:scaleX(-1)}
+@media(max-width:600px){.carousel{aspect-ratio:4/3}}
+</style></head><body>
+<header><div class="hw">
+ <div class="logo">
+  <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#c1121f"/><path d="M10 38l5-11c1-2 3-3 5-3h24c2 0 4 1 5 3l5 11v8h-6v-4H16v4h-6z" fill="#fff"/><circle cx="19" cy="40" r="3.5" fill="#c1121f"/><circle cx="45" cy="40" r="3.5" fill="#c1121f"/><path d="M19 27h26l3 7H16z" fill="#c1121f" opacity=".25"/></svg>
+  <div><b>Autos <span>Alba</span></b><small>Compra · Vende · Estrena</small></div>
+ </div>
+ <button class="sec" id="bAdmin" style="display:none">Administrar</button>
+ <button class="sec" id="bSitio" style="display:none">Ver sitio</button>
+ <button class="sec" id="bOut" style="display:none">Salir</button>
+</div></header>
+<main>
+ <div id="gate" style="display:none;text-align:center;padding:60px 0"><h2>Acceso administrador</h2><button id="bGate">Iniciar sesión</button></div>
+ <section id="vSitio">
+  <div class="carousel" id="car"></div>
+  <h3 class="sec">Búsqueda rápida</h3>
+  <div class="filters">
+   <input id="fq" placeholder="Buscar marca o modelo…">
+   <select id="fm"><option value="">Todas las marcas</option></select>
+   <select id="fo"><option value="">Ordenar</option><option value="a">Precio: menor a mayor</option><option value="d">Precio: mayor a menor</option><option value="y">Más recientes (año)</option></select>
+  </div>
+  <h3 class="sec">Nuestros autos</h3>
+  <div class="grid" id="grid"></div>
+  <div class="perks"><div><b>🛡️ Autos revisados</b>Cada unidad pasa por una revisión mecánica antes de venderse.</div><div><b>🤝 Asesoría personal</b>Te acompañamos en todo el proceso de compra.</div><div><b>💰 Mejor precio</b>Promociones y financiamiento a tu medida.</div></div>
+ </section>
+ <section id="vAdmin" style="display:none">
+  <div class="tabs"><button data-t="autos" class="on">Autos</button><button data-t="promos">Promociones</button><button data-t="ajustes">Ajustes</button></div>
+  <div id="tAutos"></div><div id="tPromos" style="display:none"></div><div id="tAjustes" style="display:none"></div>
+ </section>
+</main>
+<footer><div class="fw"><div><b>Autos Alba</b><span>Compra · Vende · Estrena</span></div><div><b>Contacto</b><span id="fTel">Pregunta por nuestras promociones</span></div></div>© Autos Alba · Todos los derechos reservados<a href="#" id="bLogin" style="display:none"></a></footer>
+<div class="modal" id="modal"><div class="mb" id="mb"></div></div>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var db=null,assets=null,user=null,cars=[],promos=[],cfg={},canAdmin=false,view="sitio",tab="autos",editing=null,form=null,pform=null,slideI=0,timer=null;
+function el(t,a,k){var e=document.createElement(t);for(var x in a||{}){if(x==="text")e.textContent=a[x];else if(x==="on")for(var y in a.on)e.addEventListener(y,a.on[y]);else if(x==="style")e.style.cssText=a[x];else if(x==="class")e.className=a[x];else e[x]=a[x]}(k||[]).forEach(function(c){if(c)e.appendChild(c)});return e}
+function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0})}
+function price(c){return c.promo?money(c.promo):money(c.precio)}
+function bg(u){return u?"background-image:url('"+u+"')":""}
+function safeUrl(u){return u&&/^(https?:|\/_blob\/|data:image\/)/.test(u)?u:""}
+function fotoOf(c){return safeUrl((c.fotos||[])[0])}
+var loaders=[];
+function showErr(e){var b=$("#err");if(!b){b=el("div",{id:"err",style:"background:#7a0c14;color:#fff;padding:8px 14px;font-size:.85rem"});document.body.insertBefore(b,document.body.firstChild)}b.textContent="Error de datos: "+((e&&(e.code||e.message))||e)}
+function watch(path,set){
+  var q=db.collection(path);
+  function apply(s){set(s.docs.map(function(x){return Object.assign({},x.data(),{id:x.id})}));render()}
+  function load(){return q.get().then(apply).catch(showErr)}
+  loaders.push(load);load();
+  try{q.onSnapshot(apply,showErr)}catch(e){showErr(e)}
+}
+function reload(){loaders.forEach(function(f){f()})}
+function ready(){
+  var d=db;if(!d)return;
+  watch("cars",function(a){cars=a});
+  watch("promos",function(a){promos=a});
+  d.doc("config/site").onSnapshot(function(s){cfg=s.exists?s.data():{};render()},function(){});
+}
+function render(){
+  var gate=$("#gate");if(gate)gate.style.display=MODE==="admin"&&!canAdmin?"":"none";
+  if(MODE==="admin"&&!canAdmin){$("#vSitio").style.display="none";$("#vAdmin").style.display="none";$("#bAdmin").style.display="none";$("#bSitio").style.display="none";$("#bOut").style.display="none";return}
+  $("#vSitio").style.display=view==="sitio"?"":"none";
+  $("#vAdmin").style.display=view==="admin"?"":"none";
+  $("#bAdmin").style.display=canAdmin&&view==="sitio"?"":"none";
+  $("#bSitio").style.display=canAdmin&&view==="admin"?"":"none";
+  $("#bOut").style.display=MODE==="admin"&&canAdmin?"":"none";$("#bLogin").style.display="none";
+  if(view==="sitio"){renderCarousel();renderGrid()}else renderAdmin();
+}
+function slides(){
+  var s=promos.filter(function(p){return p.activa!==false}).sort(function(a,b){return(a.orden||0)-(b.orden||0)}).map(function(p){return{tag:"Promoción",t:p.titulo,d:p.texto,img:safeUrl(p.foto)}});
+  cars.filter(function(c){return c.nuevo&&!c.vendido}).forEach(function(c){s.push({tag:"Recién llegado",t:c.marca+" "+c.modelo+" "+(c.anio||""),d:price(c),img:fotoOf(c),id:c.id})});
+  if(!s.length)s.push({tag:"Bienvenido",t:"Autos Alba",d:"Encuentra aquí tu próximo auto."});
+  return s;
+}
+function renderCarousel(){
+  var box=$("#car"),s=slides();box.textContent="";if(slideI>=s.length)slideI=0;
+  s.forEach(function(x,i){
+    var sl=el("div",{class:"slide"+(i===slideI?" on":""),style:bg(x.img)},[el("div",{class:"tx"},[el("span",{class:"tag",text:x.tag}),el("h2",{text:x.t||""}),el("p",{text:x.d||""})])]);
+    if(x.id){sl.style.cursor="pointer";sl.addEventListener("click",function(){openCar(x.id)})}
+    box.appendChild(sl)});
+  if(s.length>1){
+    box.appendChild(el("button",{class:"nav l",text:"‹",on:{click:function(e){e.stopPropagation();go(-1)}}}));
+    box.appendChild(el("button",{class:"nav r",text:"›",on:{click:function(e){e.stopPropagation();go(1)}}}));
+    var dots=el("div",{class:"dots"});s.forEach(function(_,i){dots.appendChild(el("i",{class:i===slideI?"on":"",on:{click:function(){slideI=i;renderCarousel()}}}))});box.appendChild(dots);
+  }
+  clearInterval(timer);if(s.length>1)timer=setInterval(function(){go(1)},5000);
+}
+function go(n){var l=slides().length;slideI=(slideI+n+l)%l;renderCarousel()}
+var ARR='<svg viewBox="61 39 58 100"><path d="M119 47.3166C119 48.185 118.668 48.9532 118.003 49.6212L78.8385 89L118.003 128.379C118.668 129.047 119 129.815 119 130.683C119 131.552 118.668 132.32 118.003 132.988L113.021 137.998C112.356 138.666 111.592 139 110.729 139C109.865 139 109.101 138.666 108.436 137.998L61.9966 91.3046C61.3322 90.6366 61 89.8684 61 89C61 88.1316 61.3322 87.3634 61.9966 86.6954L108.436 40.002C109.101 39.334 109.865 39 110.729 39C111.592 39 112.356 39.334 113.021 40.002L118.003 45.012C118.668 45.68 119 46.4482 119 47.3166Z" fill="#8a929c"></path></svg>';
+var IC={
+ u:'<svg viewBox="0 0 20 22"><circle cx="10" cy="5.5" r="5.2" fill="#A2A2A3"/><path d="M17.2154 22C18.9233 22 20.347 20.8843 19.9252 19.5707C19.4517 18.0962 18.5507 16.738 17.2887 15.636C15.3556 13.9482 12.7338 13 10 13C7.26621 13 4.64439 13.9482 2.71131 15.636C1.44926 16.738 0.548269 18.0962 0.0748233 19.5706C-0.346982 20.8843 1.07671 22 2.78456 22L17.2154 22Z" fill="#A2A2A3"></path></svg>',
+ d:'<svg viewBox="0 0 22 22"><path fill="#A2A2A3" d="M3.24 2.58v3.65H14.2L8.87 2.58H3.24zm18.09 5.8c0-.2-.1-.4-.27-.53L9.88.1a.72.72 0 00-.36-.1h-8.2a.66.66 0 00-.48.2.58.58 0 00-.17.43v16.2H15.8a6.6 6.6 0 014.9-2.14c.16 0 .32-.07.45-.2.12-.1.18-.28.18-.45V8.38zm-16.67 3.7H2.6a.65.65 0 01-.64-.65c0-.36.28-.64.64-.64h2.06c.36 0 .65.27.65.63s-.28.64-.64.64zm12.24-5a.64.64 0 01-.62.44H2.6a.65.65 0 01-.64-.65V1.93c0-.35.28-.64.64-.64h6.47c.13 0 .25.03.36.1l7.22 4.94c.23.16.33.46.25.73zM.67 18.13v3.23c0 .35.28.64.64.64H13.4c.36 0 .65-.3.65-.64 0-1.17.3-2.27.83-3.23H.66z"></path></svg>',
+ m:'<svg viewBox="0 0 22 20"><path fill="#A2A2A3" d="M20.17 3.58h-4.6v-.9c0-1.02-.8-1.85-1.82-1.85h-5.5c-1 0-1.83.83-1.83 1.84v.9h-4.6C.82 3.57 0 4.4 0 5.42v2.75C0 9.17.82 10 1.83 10h7.34v-.46c0-.25.2-.46.46-.46h2.74c.26 0 .46.2.46.46V10h7.34c1 0 1.83-.82 1.83-1.83V5.42c0-1-.82-1.84-1.83-1.84zm-6.42 0h-5.5v-.9h5.5v.9zm8 6.92c-.16-.08-.35-.07-.48.04-.33.25-.7.38-1.1.38h-7.34v1.37c0 .23-.2.44-.46.44H9.63c-.26 0-.46-.2-.46-.46V10.9H1.83c-.4 0-.77-.13-1.1-.38-.13-.1-.32-.12-.48-.05-.15.07-.25.23-.25.4v6.43c0 1 .82 1.84 1.83 1.84h18.34c1 0 1.83-.83 1.83-1.84v-6.4c0-.17-.1-.33-.25-.4z"></path></svg>',
+ f:'<svg viewBox="0 0 21 22"><path fill="#A2A2A3" d="M1.95 5.03l.48.5 1.3-1.2-.47-.5-1.3 1.2zm9.08 7.33H9v1.93h2.03v-1.95zM3.28 2.7l-.9-.87L0 4.03l.9.85 2.38-2.2zm9.92 7.62H6.83v6h6.35v-6zm-1.33 4.37c0 .1-.04.2-.12.26-.08.07-.2.1-.3.1H8.58c-.1 0-.22-.03-.3-.1-.08-.08-.12-.18-.12-.28v-2.74c0-.1.04-.2.12-.28.08-.07.2-.1.3-.1h2.87c.1 0 .22.03.3.1.08.08.12.18.12.28v2.73zM1.03 8.34v11.2c0 .65.27 1.27.76 1.73.47.46 1.13.72 1.8.72h12.8c.7 0 1.35-.26 1.83-.72.5-.46.76-1.08.76-1.73V1.03c0-.14-.04-.27-.1-.4-.03-.1-.1-.23-.2-.33s-.23-.17-.36-.22C18.2.03 18.06 0 17.92 0h-7.8c-.6 0-1.06.46-1.06 1.03v1.85c0 .1-.06.2-.14.3-.1.06-.2.1-.3.1H6.5c-.3 0-.56.1-.77.3L1.35 7.6c-.1.1-.18.22-.23.35-.06.12-.1.26-.1.4zm9.4-6.33c0-.3.13-.57.35-.78.23-.2.53-.33.84-.33h4.8c.05 0 .1.03.16.05.05.02.1.04.13.08.06.04.1.08.1.13.04.05.05.1.05.15 0 .7-.3 1.37-.82 1.86-.5.5-1.22.76-1.95.76h-3.2c-.24 0-.44-.15-.44-.37v-1.5zM3.8 7.96c-.05-.04-.1-.08-.1-.13-.03-.05-.04-.1-.04-.15 0-.05 0-.1.03-.15 0-.05.04-.1.1-.13.02-.04.06-.07.1-.1.07 0 .1-.02.18-.02.04 0 .1.02.15.04.05.02.1.05.13.08L6.6 9.53h6.83l2.25-2.13c.04-.03.08-.06.13-.08.08-.02.13-.03.18-.03.06 0 .1 0 .17 0 .05.03.1.06.13.1.04.03.07.07.1.12 0 .05.02.1.02.15 0 .06-.02.1-.04.15-.02.05-.05.1-.1.13l-2.23 2.13v6.46l2.24 2.1c.04.03.07.08.1.12 0 .05.03.1.03.16 0 .05 0 .1-.03.15-.02.04-.06.08-.1.12-.03.03-.08.06-.13.1-.05 0-.1 0-.16 0s-.1 0-.16-.02c-.05 0-.1-.04-.14-.08l-2.24-2.1H6.6l-2.22 2.1c-.08.07-.2.12-.3.12-.1 0-.2-.05-.3-.12-.07-.08-.12-.18-.12-.28 0-.1.05-.2.13-.28l2.2-2.1V10.1L3.8 7.95z"></path></svg>'};
+function ico(n,v){var s=el("span",{class:"i"});s.innerHTML=IC[n];s.appendChild(document.createTextNode(String(v)));return s}
+function makeRow(k,mn){
+  var track=el("div",{class:"track"});
+  function step(d){track.scrollBy({left:d*track.clientWidth*0.9,behavior:"smooth"})}
+  var h=el("h3",{text:k},[el("small",{text:"( desde "+money(mn)+" )"})]);
+  var sec=el("section",{class:"cat"},[el("div",{class:"cath"},[h,el("div",{class:"arr"},[el("button",{innerHTML:ARR,on:{click:function(){step(-1)}}}),el("button",{innerHTML:ARR,class:"fl",on:{click:function(){step(1)}}})])]),track]);
+  return{sec:sec,track:track};
+}
+function renderGrid(){
+  var q=$("#fq").value.toLowerCase(),m=$("#fm").value,o=$("#fo").value,sel=$("#fm");
+  var marcas=Array.from(new Set(cars.map(function(c){return c.marca}).filter(Boolean))).sort();
+  if(sel.options.length!==marcas.length+1){sel.textContent="";sel.appendChild(el("option",{value:"",text:"Todas las marcas"}));marcas.forEach(function(x){sel.appendChild(el("option",{value:x,text:x}))});sel.value=m}
+  var list=cars.filter(function(c){return(!m||c.marca===m)&&((c.marca+" "+c.modelo).toLowerCase().indexOf(q)>-1)});
+  list.sort(function(a,b){
+    if(o==="a")return(a.promo||a.precio)-(b.promo||b.precio);if(o==="d")return(b.promo||b.precio)-(a.promo||a.precio);if(o==="y")return(b.anio||0)-(a.anio||0);
+    return(a.vendido?1:0)-(b.vendido?1:0)});
+  var root=$("#grid");root.textContent="";root.className="";var rows={};
+  var g={cur:null,appendChild:function(n){
+    if(!g.cur){root.appendChild(n);return}
+    var k=g.cur.categoria||"Otros";
+    if(!rows[k]){var mn=Math.min.apply(null,list.filter(function(x){return(x.categoria||"Otros")===k}).map(function(x){return x.promo||x.precio||0}));rows[k]=makeRow(k,mn);root.appendChild(rows[k].sec)}
+    rows[k].track.appendChild(n)}};
+  if(!list.length){g.appendChild(el("div",{class:"empty",text:cars.length?"No hay autos con esos filtros.":"Pronto tendremos autos disponibles."}));return}
+  list.forEach(function(c){g.cur=c;
+    var b=el("div",{class:"badges"});
+    if(c.nuevo)b.appendChild(el("span",{class:"n",text:"Nuevo"}));if(c.promo&&!c.vendido)b.appendChild(el("span",{text:"Promoción"}));if(c.vendido)b.appendChild(el("span",{class:"v",text:"Vendido"}));
+    var pr=el("div",{class:"pr"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(price(c)));
+    g.appendChild(el("div",{class:"car",on:{click:function(){openCar(c.id)}}},[
+      el("div",{class:"ph",style:bg(fotoOf(c))},[b]),
+      el("div",{class:"bd"},[el("h4",{text:c.marca+" "+c.modelo}),el("div",{class:"yr",text:c.anio||""}),
+      el("div",{class:"av"+(c.vendido?" no":"")},[el("span",{text:c.vendido?"\u2715 Vendido":"\u2713 Disponible"}),document.createTextNode(c.vendido?"":" \u00b7 agenda tu cita")]),
+      el("div",{class:"ic"},[ico("u",c.asientos||"-"),ico("d",c.puertas||"-"),ico("m",c.maletas||"-"),ico("f",c.combustible||"-")]),
+      el("div",{class:"foot"},[pr,el("span",{class:"mas",text:"Ver m\u00e1s"})])])]))});
+}
+function openCar(id){
+  var c=cars.find(function(x){return x.id===id});if(!c)return;
+  var fotos=(c.fotos||[]).map(safeUrl).filter(Boolean),big=el("img",{class:"big",alt:c.marca+" "+c.modelo});
+  var th=el("div",{class:"th"});
+  function show(i){big.src=fotos[i]||"";Array.from(th.children).forEach(function(t,k){t.className=k===i?"on":""})}
+  fotos.forEach(function(u,i){th.appendChild(el("img",{src:u,alt:"",on:{click:function(){show(i)}}}))});
+  var sp=[["Año",c.anio],["Kilometraje",c.km!==""&&c.km!=null?Number(c.km).toLocaleString("es-MX")+" km":""],["Transmisión",c.transmision],["Combustible",c.combustible],["Color",c.color],["Asientos",c.asientos],["Puertas",c.puertas],["Maletas",c.maletas]].filter(function(x){return x[1]});
+  var specs=el("div",{class:"specs"});sp.forEach(function(x){specs.appendChild(el("div",{},[el("b",{text:x[0]}),document.createTextNode(String(x[1]))]))});
+  var pr=el("div",{class:"pr",style:"font-size:1.6rem"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(c.vendido?"Vendido":price(c)));
+  var tel=String(cfg.whatsapp||"").replace(/\D/g,"");
+  var kids=[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("div",{class:"gal"},[fotos.length?big:el("div",{class:"empty",text:"Sin fotos"}),fotos.length>1?th:null]),el("h3",{text:c.marca+" "+c.modelo,style:"margin:12px 0 0"}),pr,specs,el("p",{text:c.descripcion||""})];
+  if(tel&&!c.vendido)kids.push(el("a",{class:"btn",style:"display:inline-block;text-decoration:none",target:"_blank",rel:"noopener",href:"https://wa.me/"+tel+"?text="+encodeURIComponent("Hola, me interesa el "+c.marca+" "+c.modelo+" "+(c.anio||"")),text:"Contactar por WhatsApp"}));
+  var mb=$("#mb");mb.textContent="";kids.forEach(function(k){mb.appendChild(k)});if(fotos.length)show(0);$("#modal").classList.add("on");
+}
+function closeM(){$("#modal").classList.remove("on")}
+$("#modal").addEventListener("click",function(e){if(e.target.id==="modal")closeM()});
+["fq","fm","fo"].forEach(function(i){$("#"+i).addEventListener("input",renderGrid)});
+$("#bAdmin").onclick=function(){view="admin";render()};
+$("#bSitio").onclick=function(){view="sitio";render()};
+document.querySelectorAll(".tabs button").forEach(function(b){b.onclick=function(){tab=b.dataset.t;renderAdmin()}});
+function resize(file){
+  return createImageBitmap(file).then(function(bm){
+    var r=Math.min(1,1280/Math.max(bm.width,bm.height)),cv=document.createElement("canvas");cv.width=Math.round(bm.width*r);cv.height=Math.round(bm.height*r);
+    cv.getContext("2d").drawImage(bm,0,0,cv.width,cv.height);
+    return new Promise(function(ok){cv.toBlob(ok,"image/jpeg",.82)})});
+}
+function upload(files,cb,btn){
+  if(!assets){alert("No se pueden subir fotos con esta sesión.");return}
+  btn.disabled=true;btn.textContent="Subiendo…";
+  Promise.all(Array.from(files).map(function(f){return resize(f).then(function(b){return assets.upload(b)}).then(function(r){return r.url})}))
+   .then(cb).catch(function(e){alert("Error al subir: "+(e&&e.message||e))}).then(function(){btn.disabled=false;btn.textContent="Agregar fotos"});
+}
+function fld(lbl,key,obj,type,opts){
+  var i;
+  if(opts){i=el("select");opts.forEach(function(o){i.appendChild(el("option",{value:o,text:o||"—"}))})}
+  else i=type==="area"?el("textarea",{rows:3}):el("input",{type:type||"text"});
+  i.value=obj[key]==null?"":obj[key];
+  i.addEventListener("input",function(){obj[key]=(type==="number"&&i.value!=="")?Number(i.value):i.value});
+  return el("div",{},[el("label",{text:lbl}),i]);
+}
+function photoBox(obj,key){
+  var wrap=el("div",{class:"fotos"});
+  (obj[key]||[]).forEach(function(u,i){wrap.appendChild(el("div",{},[el("img",{src:safeUrl(u),alt:""}),el("button",{text:"✕",on:{click:function(){obj[key].splice(i,1);renderAdmin()}}})]))});
+  return wrap;
+}
+function renderAdmin(){
+  document.querySelectorAll(".tabs button").forEach(function(b){b.className=b.dataset.t===tab?"on":""});
+  $("#tAutos").style.display=tab==="autos"?"":"none";$("#tPromos").style.display=tab==="promos"?"":"none";$("#tAjustes").style.display=tab==="ajustes"?"":"none";
+  if(tab==="autos")adminAutos();else if(tab==="promos")adminPromos();else adminAjustes();
+}
+function adminAutos(){
+  var r=$("#tAutos");r.textContent="";
+  var f=form;
+  if(f){
+    var d=f.d;d.fotos=d.fotos||[];
+    var fi=el("input",{type:"file",accept:"image/*",multiple:true,style:"display:none"}),ub=el("button",{class:"sec",text:"Agregar fotos",on:{click:function(){fi.click()}}});
+    fi.addEventListener("change",function(){upload(fi.files,function(u){d.fotos=d.fotos.concat(u);renderAdmin()},ub)});
+    r.appendChild(el("div",{class:"panel"},[el("h3",{text:f.id?"Editar auto":"Nuevo auto",style:"margin-top:0"}),
+      el("div",{class:"fg"},[fld("Marca","marca",d),fld("Modelo","modelo",d),fld("Año","anio",d,"number"),fld("Precio (MXN)","precio",d,"number"),fld("Precio promoción (opcional)","promo",d,"number"),fld("Kilometraje","km",d,"number"),fld("Transmisión","transmision",d,null,["","Manual","Automática"]),fld("Combustible","combustible",d,null,["","Gasolina","Diésel","Híbrido","Eléctrico"]),fld("Color","color",d),fld("Asientos","asientos",d,"number"),fld("Puertas","puertas",d,"number"),fld("Maletas","maletas",d,"number"),fld("Categoría","categoria",d,null,["","Compactos","Sedanes","SUV","Camionetas","Deportivos","Lujo"])]),
+      el("div",{style:"margin-top:10px"},[fld("Descripción / características","descripcion",d,"area")]),
+      el("div",{style:"margin-top:10px;display:flex;gap:18px;flex-wrap:wrap"},[chk("Marcar como nuevo ingreso (sale en el carrusel)","nuevo",d),chk("Vendido","vendido",d)]),
+      el("p",{class:"note",text:"Fotos (la primera es la portada):"}),photoBox(d,"fotos"),ub,fi,
+      el("div",{style:"margin-top:14px;display:flex;gap:8px"},[el("button",{text:"Guardar",on:{click:saveCar}}),el("button",{class:"sec",text:"Cancelar",on:{click:function(){form=null;renderAdmin()}}})])]));
+    return}
+  r.appendChild(el("button",{text:"+ Agregar auto",on:{click:function(){form={id:null,d:{fotos:[]}};renderAdmin()}}}));
+  var p=el("div",{class:"panel",style:"margin-top:12px"});
+  if(!cars.length)p.appendChild(el("div",{class:"empty",text:"Aún no hay autos registrados."}));
+  cars.forEach(function(c){p.appendChild(el("div",{class:"row"},[el("img",{src:fotoOf(c),alt:""}),el("div",{class:"t"},[el("b",{text:c.marca+" "+c.modelo+" "+(c.anio||"")}),el("div",{class:"sp",text:price(c)+(c.vendido?" · Vendido":"")+(c.promo?" · Promo":"")+(c.nuevo?" · Nuevo":"")})]),
+    el("button",{class:"sec",text:"Editar",on:{click:function(){form={id:c.id,d:JSON.parse(JSON.stringify(c))};delete form.d.id;renderAdmin()}}}),
+    el("button",{class:"danger",text:"Eliminar",on:{click:function(){if(confirm("¿Eliminar este auto?"))db.doc("cars/"+c.id).delete().then(reload)}}})]))});
+  r.appendChild(p);
+}
+function chk(l,k,o){var i=el("input",{type:"checkbox",style:"width:auto",checked:!!o[k]});i.addEventListener("change",function(){o[k]=i.checked});return el("label",{style:"display:flex;gap:6px;align-items:center;color:var(--tx)"},[i,document.createTextNode(l)])}
+function saveCar(){
+  var d=form.d;if(!d.marca||!d.modelo||!d.precio){alert("Marca, modelo y precio son obligatorios.");return}
+  if(!d.promo)delete d.promo;
+  var p=form.id?db.doc("cars/"+form.id).set(d):db.collection("cars").add(d);
+  p.then(function(){form=null;reload();renderAdmin()}).catch(function(e){alert("No se pudo guardar: "+(e&&e.message||e))});
+}
+function adminPromos(){
+  var r=$("#tPromos");r.textContent="";
+  if(pform){
+    var d=pform.d,fi=el("input",{type:"file",accept:"image/*",style:"display:none"}),ub=el("button",{class:"sec",text:"Agregar fotos",on:{click:function(){fi.click()}}});
+    fi.addEventListener("change",function(){upload(fi.files.length?[fi.files[0]]:[],function(u){d.foto=u[0];renderAdmin()},ub)});
+    ub.textContent=d.foto?"Cambiar imagen":"Agregar imagen";
+    r.appendChild(el("div",{class:"panel"},[el("h3",{text:pform.id?"Editar promoción":"Nueva promoción",style:"margin-top:0"}),
+      el("div",{class:"fg"},[fld("Título","titulo",d),fld("Orden (1 primero)","orden",d,"number")]),
+      el("div",{style:"margin-top:10px"},[fld("Texto","texto",d,"area")]),
+      d.foto?el("div",{class:"fotos"},[el("img",{src:safeUrl(d.foto),alt:""})]):null,ub,fi,
+      el("div",{style:"margin-top:10px"},[chk("Activa (visible en el carrusel)","activa",d)]),
+      el("div",{style:"margin-top:14px;display:flex;gap:8px"},[el("button",{text:"Guardar",on:{click:function(){
+        if(!d.titulo){alert("El título es obligatorio.");return}
+        var p=pform.id?db.doc("promos/"+pform.id).set(d):db.collection("promos").add(d);
+        p.then(function(){pform=null;reload();renderAdmin()}).catch(function(e){alert("No se pudo guardar: "+(e&&e.message||e))})}}}),el("button",{class:"sec",text:"Cancelar",on:{click:function(){pform=null;renderAdmin()}}})])]));
+    return}
+  r.appendChild(el("button",{text:"+ Agregar promoción",on:{click:function(){pform={id:null,d:{activa:true,orden:promos.length+1}};renderAdmin()}}}));
+  var p=el("div",{class:"panel",style:"margin-top:12px"});
+  if(!promos.length)p.appendChild(el("div",{class:"empty",text:"Aún no hay promociones."}));
+  promos.forEach(function(x){p.appendChild(el("div",{class:"row"},[el("img",{src:safeUrl(x.foto),alt:""}),el("div",{class:"t"},[el("b",{text:x.titulo}),el("div",{class:"sp",text:x.activa===false?"Oculta":"Activa"})]),
+    el("button",{class:"sec",text:"Editar",on:{click:function(){pform={id:x.id,d:JSON.parse(JSON.stringify(x))};delete pform.d.id;renderAdmin()}}}),
+    el("button",{class:"danger",text:"Eliminar",on:{click:function(){if(confirm("¿Eliminar promoción?"))db.doc("promos/"+x.id).delete().then(reload)}}})]))});
+  r.appendChild(p);
+}
+function adminAjustes(){
+  var r=$("#tAjustes");r.textContent="";var d=Object.assign({},cfg);
+  r.appendChild(el("div",{class:"panel"},[fld("WhatsApp de contacto (con lada, ej. 5218661234567)","whatsapp",d),el("button",{text:"Guardar",style:"margin-top:12px",on:{click:function(){db.doc("config/site").set(d).then(function(){alert("Guardado")})}}})]));
+}
+var MODE=window.APP_MODE||"public",CFG=window.APP_CONFIG||{},sb=null;
+var COLS={cars:["marca","modelo","anio","precio","promo","km","transmision","combustible","color","categoria","asientos","puertas","maletas","descripcion","fotos","nuevo","vendido"],promos:["titulo","texto","foto","orden","activa"]};
+function pick(t,d,full){var o={};COLS[t].forEach(function(k){if(d[k]!==undefined&&d[k]!=="")o[k]=d[k];else if(full)o[k]=null});return o}
+function ck(r){if(r.error)throw r.error;return r.data}
+function loginUI(){
+  var em=el("input",{type:"email",placeholder:"Correo"}),pw=el("input",{type:"password",placeholder:"Contraseña",style:"margin-top:8px"}),msg=el("p",{class:"note"});
+  var go=el("button",{text:"Entrar",style:"margin-top:10px",on:{click:function(){
+    msg.textContent="Entrando…";
+    sb.auth.signInWithPassword({email:em.value.trim(),password:pw.value}).then(function(r){if(r.error)throw r.error;return sb.rpc("is_admin")}).then(function(x){
+      if(x.data!==true){msg.textContent="Esta cuenta no tiene permisos de administrador.";return sb.auth.signOut()}
+      canAdmin=true;view="admin";closeM();render()}).catch(function(e){msg.textContent="No se pudo entrar: "+(e.message||e)})}}});
+  var mb=$("#mb");mb.textContent="";[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("h3",{text:"Acceso administrador",style:"margin-top:0"}),em,pw,go,msg].forEach(function(k){mb.appendChild(k)});$("#modal").classList.add("on");
+}
+$("#bLogin").onclick=function(e){e.preventDefault()};
+$("#bGate").onclick=function(){if(sb)loginUI()};
+$("#bOut").onclick=function(){sb.auth.signOut().then(function(){canAdmin=false;view="sitio";render()})};
+if(!CFG.url||String(CFG.url).indexOf("http")!==0){showErr("Falta configurar config.js");render()}
+else{
+  sb=window.supabase.createClient(CFG.url,CFG.key);
+  db={
+    collection:function(t){return{
+      get:function(){return sb.from(t).select("*").order("created_at",{ascending:false}).then(function(r){return{docs:ck(r).map(function(x){return{id:x.id,data:function(){return x}}})}})},
+      onSnapshot:function(){},
+      add:function(d){return sb.from(t).insert(pick(t,d,false)).then(ck)}}},
+    doc:function(p){var a=p.split("/"),t=a[0],id=a[1];
+      if(t==="config")return{
+        onSnapshot:function(cb){sb.from("settings").select("*").then(function(r){var o={};(ck(r)||[]).forEach(function(x){o[x.key]=x.value});cb({exists:true,data:function(){return o}})}).catch(function(){})},
+        set:function(d){return sb.from("settings").upsert(Object.keys(d).map(function(k){return{key:k,value:String(d[k]==null?"":d[k])}})).then(ck)}};
+      return{set:function(d){return sb.from(t).update(pick(t,d,true)).eq("id",id).then(ck)},delete:function(){return sb.from(t).delete().eq("id",id).then(ck)}}}
+  };
+  assets={upload:function(blob){var path=Date.now()+"-"+Math.random().toString(36).slice(2)+".jpg";
+    return sb.storage.from("fotos").upload(path,blob,{contentType:"image/jpeg"}).then(function(r){if(r.error)throw r.error;return{url:sb.storage.from("fotos").getPublicUrl(path).data.publicUrl}})}};
+  ready();render();
+  if(MODE==="admin")sb.auth.getSession().then(function(r){if(!r.data.session)return false;return sb.rpc("is_admin").then(function(x){return x.data===true})}).then(function(a){canAdmin=!!a;if(a)view="admin";render();if(!a)loginUI()}).catch(function(){});
+}
+</script></body></html>
