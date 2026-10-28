@@ -1,5 +1,4 @@
-// Pega aquí los datos de tu proyecto de Supabase (Project Settings → API)
 window.APP_CONFIG = {
-  url: "https://TU-PROYECTO.supabase.co",
-  key: "TU_CLAVE_PUBLICA_ANON"
+  url: "https://wwkmlketlnugehjltlgh.supabase.co",
+  key: "sb_publishable_9tkNQSMbaS_UpVd9ZW30Dg_F34Gm8p6"
 };
