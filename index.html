@@ -101,6 +101,7 @@ footer{background:var(--hd);color:#ffffffb0;margin-top:30px}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .car .pr{color:var(--tx)}}
 .arr button{background:#f3f4f6;border:0;border-radius:0;padding:14px 20px}
 .arr svg{width:10px;height:17px;display:block}.arr .fl svg{transform:scaleX(-1)}
+html:not(.adm) header{display:none}
 @media(max-width:600px){.carousel{aspect-ratio:4/3}}
 </style></head><body>
 <header><div class="hw">
@@ -138,6 +139,7 @@ footer{background:var(--hd);color:#ffffffb0;margin-top:30px}
 var $=function(s){return document.querySelector(s)};
 var db=null,assets=null,user=null,cars=[],promos=[],cfg={},canAdmin=false,view="sitio",tab="autos",editing=null,form=null,pform=null,slideI=0,timer=null;
 function el(t,a,k){var e=document.createElement(t);for(var x in a||{}){if(x==="text")e.textContent=a[x];else if(x==="on")for(var y in a.on)e.addEventListener(y,a.on[y]);else if(x==="style")e.style.cssText=a[x];else if(x==="class")e.className=a[x];else e[x]=a[x]}(k||[]).forEach(function(c){if(c)e.appendChild(c)});return e}
+function U(s){return String(s==null?"":s).trim().toUpperCase()}
 function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0})}
 function price(c){return c.promo?money(c.promo):money(c.precio)}
 function bg(u){return u?"background-image:url('"+u+"')":""}
@@ -171,7 +173,7 @@ function render(){
 }
 function slides(){
   var s=promos.filter(function(p){return p.activa!==false}).sort(function(a,b){return(a.orden||0)-(b.orden||0)}).map(function(p){return{tag:"Promoción",t:p.titulo,d:p.texto,img:safeUrl(p.foto)}});
-  cars.filter(function(c){return c.nuevo&&!c.vendido}).forEach(function(c){s.push({tag:"Recién llegado",t:c.marca+" "+c.modelo+" "+(c.anio||""),d:price(c),img:fotoOf(c),id:c.id})});
+  cars.filter(function(c){return c.nuevo&&!c.vendido}).forEach(function(c){s.push({tag:"Recién llegado",t:U(c.marca)+" "+U(c.modelo)+" "+(c.anio||""),d:price(c),img:fotoOf(c),id:c.id})});
   if(!s.length)s.push({tag:"Bienvenido",t:"Autos Alba",d:"Encuentra aquí tu próximo auto."});
   return s;
 }
@@ -205,9 +207,9 @@ function makeRow(k,mn){
 }
 function renderGrid(){
   var q=$("#fq").value.toLowerCase(),m=$("#fm").value,o=$("#fo").value,sel=$("#fm");
-  var marcas=Array.from(new Set(cars.map(function(c){return c.marca}).filter(Boolean))).sort();
+  var marcas=Array.from(new Set(cars.map(function(c){return U(c.marca)}).filter(Boolean))).sort();
   if(sel.options.length!==marcas.length+1){sel.textContent="";sel.appendChild(el("option",{value:"",text:"Todas las marcas"}));marcas.forEach(function(x){sel.appendChild(el("option",{value:x,text:x}))});sel.value=m}
-  var list=cars.filter(function(c){return(!m||c.marca===m)&&((c.marca+" "+c.modelo).toLowerCase().indexOf(q)>-1)});
+  var list=cars.filter(function(c){return(!m||U(c.marca)===m)&&((c.marca+" "+c.modelo).toLowerCase().indexOf(q)>-1)});
   list.sort(function(a,b){
     if(o==="a")return(a.promo||a.precio)-(b.promo||b.precio);if(o==="d")return(b.promo||b.precio)-(a.promo||a.precio);if(o==="y")return(b.anio||0)-(a.anio||0);
     return(a.vendido?1:0)-(b.vendido?1:0)});
@@ -220,18 +222,18 @@ function renderGrid(){
   if(!list.length){g.appendChild(el("div",{class:"empty",text:cars.length?"No hay autos con esos filtros.":"Pronto tendremos autos disponibles."}));return}
   list.forEach(function(c){g.cur=c;
     var b=el("div",{class:"badges"});
-    if(c.nuevo)b.appendChild(el("span",{class:"n",text:"Nuevo"}));if(c.promo&&!c.vendido)b.appendChild(el("span",{text:"Promoción"}));if(c.vendido)b.appendChild(el("span",{class:"v",text:"Vendido"}));
+    if(c.vendido)b.appendChild(el("span",{class:"v",text:"Vendido"}));
     var pr=el("div",{class:"pr"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(price(c)));
     g.appendChild(el("div",{class:"car",on:{click:function(){openCar(c.id)}}},[
       el("div",{class:"ph",style:bg(fotoOf(c))},[b]),
-      el("div",{class:"bd"},[el("h4",{text:c.marca+" "+c.modelo}),el("div",{class:"yr",text:c.anio||""}),
+      el("div",{class:"bd"},[el("h4",{text:U(c.marca)+" "+U(c.modelo)}),el("div",{class:"yr",text:c.anio||""}),
       el("div",{class:"av"+(c.vendido?" no":"")},[el("span",{text:c.vendido?"\u2715 Vendido":"\u2713 Disponible"}),document.createTextNode(c.vendido?"":" \u00b7 agenda tu cita")]),
       el("div",{class:"ic"},[ico("u",c.asientos||"-"),ico("d",c.puertas||"-"),ico("m",c.maletas||"-"),ico("f",c.combustible||"-")]),
       el("div",{class:"foot"},[pr,el("span",{class:"mas",text:"Ver m\u00e1s"})])])]))});
 }
 function openCar(id){
   var c=cars.find(function(x){return x.id===id});if(!c)return;
-  var fotos=(c.fotos||[]).map(safeUrl).filter(Boolean),big=el("img",{class:"big",alt:c.marca+" "+c.modelo});
+  var fotos=(c.fotos||[]).map(safeUrl).filter(Boolean),big=el("img",{class:"big",alt:U(c.marca)+" "+U(c.modelo)});
   var th=el("div",{class:"th"});
   function show(i){big.src=fotos[i]||"";Array.from(th.children).forEach(function(t,k){t.className=k===i?"on":""})}
   fotos.forEach(function(u,i){th.appendChild(el("img",{src:u,alt:"",on:{click:function(){show(i)}}}))});
@@ -239,8 +241,8 @@ function openCar(id){
   var specs=el("div",{class:"specs"});sp.forEach(function(x){specs.appendChild(el("div",{},[el("b",{text:x[0]}),document.createTextNode(String(x[1]))]))});
   var pr=el("div",{class:"pr",style:"font-size:1.6rem"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(c.vendido?"Vendido":price(c)));
   var tel=String(cfg.whatsapp||"").replace(/\D/g,"");
-  var kids=[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("div",{class:"gal"},[fotos.length?big:el("div",{class:"empty",text:"Sin fotos"}),fotos.length>1?th:null]),el("h3",{text:c.marca+" "+c.modelo,style:"margin:12px 0 0"}),pr,specs,el("p",{text:c.descripcion||""})];
-  if(tel&&!c.vendido)kids.push(el("a",{class:"btn",style:"display:inline-block;text-decoration:none",target:"_blank",rel:"noopener",href:"https://wa.me/"+tel+"?text="+encodeURIComponent("Hola, me interesa el "+c.marca+" "+c.modelo+" "+(c.anio||"")),text:"Contactar por WhatsApp"}));
+  var kids=[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("div",{class:"gal"},[fotos.length?big:el("div",{class:"empty",text:"Sin fotos"}),fotos.length>1?th:null]),el("h3",{text:U(c.marca)+" "+U(c.modelo),style:"margin:12px 0 0"}),pr,specs,el("p",{text:c.descripcion||""})];
+  if(tel&&!c.vendido)kids.push(el("a",{class:"btn",style:"display:inline-block;text-decoration:none",target:"_blank",rel:"noopener",href:"https://wa.me/"+tel+"?text="+encodeURIComponent("Hola, me interesa el "+U(c.marca)+" "+U(c.modelo)+" "+(c.anio||"")),text:"Contactar por WhatsApp"}));
   var mb=$("#mb");mb.textContent="";kids.forEach(function(k){mb.appendChild(k)});if(fotos.length)show(0);$("#modal").classList.add("on");
 }
 function closeM(){$("#modal").classList.remove("on")}
@@ -296,7 +298,7 @@ function adminAutos(){
   r.appendChild(el("button",{text:"+ Agregar auto",on:{click:function(){form={id:null,d:{fotos:[]}};renderAdmin()}}}));
   var p=el("div",{class:"panel",style:"margin-top:12px"});
   if(!cars.length)p.appendChild(el("div",{class:"empty",text:"Aún no hay autos registrados."}));
-  cars.forEach(function(c){p.appendChild(el("div",{class:"row"},[el("img",{src:fotoOf(c),alt:""}),el("div",{class:"t"},[el("b",{text:c.marca+" "+c.modelo+" "+(c.anio||"")}),el("div",{class:"sp",text:price(c)+(c.vendido?" · Vendido":"")+(c.promo?" · Promo":"")+(c.nuevo?" · Nuevo":"")})]),
+  cars.forEach(function(c){p.appendChild(el("div",{class:"row"},[el("img",{src:fotoOf(c),alt:""}),el("div",{class:"t"},[el("b",{text:U(c.marca)+" "+U(c.modelo)+" "+(c.anio||"")}),el("div",{class:"sp",text:price(c)+(c.vendido?" · Vendido":"")+(c.promo?" · Promo":"")+(c.nuevo?" · Nuevo":"")})]),
     el("button",{class:"sec",text:"Editar",on:{click:function(){form={id:c.id,d:JSON.parse(JSON.stringify(c))};delete form.d.id;renderAdmin()}}}),
     el("button",{class:"danger",text:"Eliminar",on:{click:function(){if(confirm("¿Eliminar este auto?"))db.doc("cars/"+c.id).delete().then(reload)}}})]))});
   r.appendChild(p);
@@ -304,6 +306,7 @@ function adminAutos(){
 function chk(l,k,o){var i=el("input",{type:"checkbox",style:"width:auto",checked:!!o[k]});i.addEventListener("change",function(){o[k]=i.checked});return el("label",{style:"display:flex;gap:6px;align-items:center;color:var(--tx)"},[i,document.createTextNode(l)])}
 function saveCar(){
   var d=form.d;if(!d.marca||!d.modelo||!d.precio){alert("Marca, modelo y precio son obligatorios.");return}
+  d.marca=U(d.marca);d.modelo=U(d.modelo);
   if(!d.promo)delete d.promo;
   var p=form.id?db.doc("cars/"+form.id).set(d):db.collection("cars").add(d);
   p.then(function(){form=null;reload();renderAdmin()}).catch(function(e){alert("No se pudo guardar: "+(e&&e.message||e))});
