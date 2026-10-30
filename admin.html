@@ -4,7 +4,8 @@
 <title>Autos Alba · Administrador</title>
 <meta name="robots" content="noindex">
 <script>window.APP_MODE="admin";document.documentElement.className="adm"</script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <style>
@@ -162,6 +163,15 @@ html:not(.adm) header{display:none}
 .btn.wal{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;border-radius:12px;padding:12px 20px;font-weight:700}
 .btn.wal svg{width:20px;height:20px;fill:#fff}
 @media(max-width:600px){.mas{padding:12px 16px}.wa{width:44px}}
+.bigw{position:relative}
+.zm{position:absolute;right:10px;top:10px;width:42px;height:42px;border-radius:12px;background:#000a;color:#fff;padding:0;display:flex;align-items:center;justify-content:center}
+.lb{position:fixed;inset:0;background:#000e;z-index:50;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pinch-zoom}
+.lb img{max-width:96vw;max-height:92vh;object-fit:contain;cursor:zoom-in;transition:transform .2s}
+.lb img.z{transform:scale(2.2);cursor:zoom-out}
+.lbx{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;background:#ffffff30;border-radius:12px;color:#fff}
+.lbn{position:absolute;top:50%;transform:translateY(-50%);background:#ffffff30;color:#fff;border-radius:50%;width:46px;height:46px;padding:0;font-size:1.7rem}.lbn.l{left:12px}.lbn.r{right:12px}
+.toplogo{margin:0 0 6px}.toplogo img{height:92px;width:auto;display:block}
+@media(max-width:600px){.toplogo img{height:70px}}
 @media(max-width:600px){.carousel{aspect-ratio:4/3}}
 </style></head><body>
 <header><div class="hw">
@@ -176,7 +186,7 @@ html:not(.adm) header{display:none}
 <main>
  <div id="gate" style="display:none;text-align:center;padding:60px 0"><h2>Acceso administrador</h2><button id="bGate">Iniciar sesión</button></div>
  <section id="vSitio">
-  <div class="toplogo"><svg viewBox="0 0 64 64" fill="none" stroke="#222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-label="Logo"><path d="M8 42l5-12c1-2 3-3 5-3h28c2 0 4 1 5 3l5 12v8h-6v-4H14v4H8z"/><path d="M18 27l4-9h20l4 9"/><circle cx="19" cy="43" r="3.5"/><circle cx="45" cy="43" r="3.5"/></svg></div>
+  <div class="toplogo"><img src="logo.png" alt="Autos Alba"></div>
     <h3 class="sec">Búsqueda rápida</h3>
   <div class="filters">
    <input id="fq" placeholder="Buscar marca o modelo…">
@@ -205,7 +215,7 @@ var WA_DEFAULT="528134203333";
 function waLink(c){var tel=String(cfg.whatsapp||"").replace(/\D/g,"")||WA_DEFAULT;var nm=(U(c.marca)+" "+U(c.modelo)+" "+(c.anio||"")).trim();return"https://wa.me/"+tel+"?text="+encodeURIComponent("Hola, quiero informes del auto "+nm+".")}
 function waBtn(c){if(c.vendido)return null;return el("a",{class:"wa",href:waLink(c),target:"_blank",rel:"noopener",title:"Pedir informes por WhatsApp",innerHTML:WAI})}
 function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0})}
-function price(c){return c.promo?money(c.promo):money(c.precio)}
+function price(c){return Number(c.promo)>0?money(c.promo):money(c.precio)}
 function bg(u){return u?"background-image:url('"+u+"')":""}
 function safeUrl(u){return u&&/^(https?:|\/_blob\/|data:image\/)/.test(u)?u:""}
 function fotoOf(c){return safeUrl((c.fotos||[])[0])}
@@ -298,25 +308,38 @@ function renderGrid(){
   list.forEach(function(c){g.cur=c;
     var b=el("div",{class:"badges"});
     if(c.vendido)b.appendChild(el("span",{class:"v",text:"Vendido"}));
-    var pr=el("div",{class:"pr"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(price(c)));
+    var pr=el("div",{class:"pr"});if(Number(c.promo)>0)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(price(c)));
     g.appendChild(el("div",{class:"car"},[
       el("div",{class:"ph",style:bg(fotoOf(c))},[b]),
       el("div",{class:"bd"},[el("h4",{text:U(c.marca)+" "+U(c.modelo)}),el("div",{class:"yr",text:c.anio||""}),
       el("div",{class:"av"+(c.vendido?" no":"")},[el("span",{text:c.vendido?"\u2715 Vendido":"\u2713 Disponible"}),document.createTextNode(c.vendido?"":" \u00b7 agenda tu cita")]),
-      el("div",{class:"ic"},[ico("u",c.asientos||"-"),ico("d",c.puertas||"-"),ico("m",c.maletas||"-"),ico("f",c.combustible||"-")]),
+      el("div",{class:"ic"},[ico("u",c.asientos||"-"),ico("d",c.puertas||"-")]),
       el("div",{class:"foot"},[pr,el("div",{class:"acts"},[waBtn(c),el("button",{class:"mas",text:"Ver m\u00e1s",on:{click:function(){openCar(c.id)}}})])])])]))});
+}
+var ZI='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>';
+function zoom(fotos,i){
+  var old=$("#lb");if(old)old.remove();
+  var idx=i,lb=el("div",{id:"lb",class:"lb"}),im=el("img",{src:fotos[idx],alt:""});
+  function set(n){idx=(n+fotos.length)%fotos.length;im.src=fotos[idx];im.className=""}
+  function close(){lb.remove();document.removeEventListener("keydown",key)}
+  function key(e){if(e.key==="Escape")close();else if(fotos.length>1&&e.key==="ArrowRight")set(idx+1);else if(fotos.length>1&&e.key==="ArrowLeft")set(idx-1)}
+  im.addEventListener("click",function(e){var r=im.getBoundingClientRect();im.style.transformOrigin=((e.clientX-r.left)/r.width*100)+"% "+((e.clientY-r.top)/r.height*100)+"%";im.classList.toggle("z")});
+  lb.appendChild(im);lb.appendChild(el("button",{class:"lbx",text:"✕",on:{click:close}}));
+  if(fotos.length>1){lb.appendChild(el("button",{class:"lbn l",text:"‹",on:{click:function(e){e.stopPropagation();set(idx-1)}}}));lb.appendChild(el("button",{class:"lbn r",text:"›",on:{click:function(e){e.stopPropagation();set(idx+1)}}}))}
+  lb.addEventListener("click",function(e){if(e.target===lb)close()});
+  document.addEventListener("keydown",key);document.body.appendChild(lb);
 }
 function openCar(id){
   var c=cars.find(function(x){return x.id===id});if(!c)return;
   var fotos=(c.fotos||[]).map(safeUrl).filter(Boolean),big=el("img",{class:"big",alt:U(c.marca)+" "+U(c.modelo)});
-  var th=el("div",{class:"th"});
-  function show(i){big.src=fotos[i]||"";Array.from(th.children).forEach(function(t,k){t.className=k===i?"on":""})}
+  var th=el("div",{class:"th"}),curI=0,zm=el("button",{class:"zm",title:"Ampliar foto",innerHTML:ZI,on:{click:function(){zoom(fotos,curI)}}});
+  function show(i){curI=i;big.src=fotos[i]||"";Array.from(th.children).forEach(function(t,k){t.className=k===i?"on":""})}
   fotos.forEach(function(u,i){th.appendChild(el("img",{src:u,alt:"",on:{click:function(){show(i)}}}))});
-  var sp=[["Año",c.anio],["Kilometraje",c.km!==""&&c.km!=null?Number(c.km).toLocaleString("es-MX")+" km":""],["Transmisión",c.transmision],["Combustible",c.combustible],["Color",c.color],["Asientos",c.asientos],["Puertas",c.puertas],["Maletas",c.maletas]].filter(function(x){return x[1]});
+  var sp=[["Año",c.anio],["Kilometraje",c.km!==""&&c.km!=null?Number(c.km).toLocaleString("es-MX")+" km":""],["Transmisión",c.transmision],["Color",c.color],["Asientos",c.asientos],["Puertas",c.puertas]].filter(function(x){return x[1]});
   var specs=el("div",{class:"specs"});sp.forEach(function(x){specs.appendChild(el("div",{},[el("b",{text:x[0]}),document.createTextNode(String(x[1]))]))});
-  var pr=el("div",{class:"pr",style:"font-size:1.6rem"});if(c.promo)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(c.vendido?"Vendido":price(c)));
+  var pr=el("div",{class:"pr",style:"font-size:1.6rem"});if(Number(c.promo)>0)pr.appendChild(el("s",{text:money(c.precio)}));pr.appendChild(document.createTextNode(c.vendido?"Vendido":price(c)));
   var tel=String(cfg.whatsapp||"").replace(/\D/g,"");
-  var kids=[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("div",{class:"gal"},[fotos.length?big:el("div",{class:"empty",text:"Sin fotos"}),fotos.length>1?th:null]),el("h3",{text:U(c.marca)+" "+U(c.modelo),style:"margin:12px 0 0"}),pr,specs,el("p",{text:c.descripcion||""})];
+  var kids=[el("button",{class:"x",text:"✕",on:{click:closeM}}),el("div",{class:"gal"},[fotos.length?el("div",{class:"bigw"},[big,zm]):el("div",{class:"empty",text:"Sin fotos"}),fotos.length>1?th:null]),el("h3",{text:U(c.marca)+" "+U(c.modelo),style:"margin:12px 0 0"}),pr,specs,el("p",{text:c.descripcion||""})];
   if(!c.vendido)kids.push(el("a",{class:"btn wal",target:"_blank",rel:"noopener",href:waLink(c),innerHTML:WAI+" Pedir informes por WhatsApp"}));
   var mb=$("#mb");mb.textContent="";kids.forEach(function(k){mb.appendChild(k)});if(fotos.length)show(0);$("#modal").classList.add("on");
 }
@@ -364,16 +387,16 @@ function adminAutos(){
     var fi=el("input",{type:"file",accept:"image/*",multiple:true,style:"display:none"}),ub=el("button",{class:"sec",text:"Agregar fotos",on:{click:function(){fi.click()}}});
     fi.addEventListener("change",function(){upload(fi.files,function(u){d.fotos=d.fotos.concat(u);renderAdmin()},ub)});
     r.appendChild(el("div",{class:"panel"},[el("h3",{text:f.id?"Editar auto":"Nuevo auto",style:"margin-top:0"}),
-      el("div",{class:"fg"},[fld("Marca","marca",d),fld("Modelo","modelo",d),fld("Año","anio",d,"number"),fld("Precio (MXN)","precio",d,"number"),fld("Precio promoción (opcional)","promo",d,"number"),fld("Kilometraje","km",d,"number"),fld("Transmisión","transmision",d,null,["","Manual","Automática"]),fld("Combustible","combustible",d,null,["","Gasolina","Diésel","Híbrido","Eléctrico"]),fld("Color","color",d),fld("Asientos","asientos",d,"number"),fld("Puertas","puertas",d,"number"),fld("Maletas","maletas",d,"number"),fld("Categoría","categoria",d,null,["","Compactos","Sedanes","SUV","Camionetas","Deportivos","Lujo"])]),
+      el("div",{class:"fg"},[fld("Marca","marca",d),fld("Modelo","modelo",d),fld("Año","anio",d,"number"),fld("Precio (MXN)","precio",d,"number"),fld("Precio promoción (opcional)","promo",d,"number"),fld("Kilometraje","km",d,"number"),fld("Transmisión","transmision",d,null,["","Manual","Automática"]),fld("Color","color",d),fld("Asientos","asientos",d,"number"),fld("Puertas","puertas",d,"number"),fld("Categoría","categoria",d,null,["","Compactos","Sedanes","SUV","Camionetas","Deportivos","Lujo"])]),
       el("div",{style:"margin-top:10px"},[fld("Descripción / características","descripcion",d,"area")]),
-      el("div",{style:"margin-top:10px;display:flex;gap:18px;flex-wrap:wrap"},[chk("Marcar como nuevo ingreso (sale en el carrusel)","nuevo",d),chk("Vendido","vendido",d)]),
+      el("div",{style:"margin-top:10px;display:flex;gap:18px;flex-wrap:wrap"},[chk("Marcar como nuevo ingreso","nuevo",d),chk("Vendido","vendido",d)]),
       el("p",{class:"note",text:"Fotos (la primera es la portada):"}),photoBox(d,"fotos"),ub,fi,
       el("div",{style:"margin-top:14px;display:flex;gap:8px"},[el("button",{text:"Guardar",on:{click:saveCar}}),el("button",{class:"sec",text:"Cancelar",on:{click:function(){form=null;renderAdmin()}}})])]));
     return}
   r.appendChild(el("button",{text:"+ Agregar auto",on:{click:function(){form={id:null,d:{fotos:[]}};renderAdmin()}}}));
   var p=el("div",{class:"panel",style:"margin-top:12px"});
   if(!cars.length)p.appendChild(el("div",{class:"empty",text:"Aún no hay autos registrados."}));
-  cars.forEach(function(c){p.appendChild(el("div",{class:"row"},[el("img",{src:fotoOf(c),alt:""}),el("div",{class:"t"},[el("b",{text:U(c.marca)+" "+U(c.modelo)+" "+(c.anio||"")}),el("div",{class:"sp",text:price(c)+(c.vendido?" · Vendido":"")+(c.promo?" · Promo":"")+(c.nuevo?" · Nuevo":"")})]),
+  cars.forEach(function(c){p.appendChild(el("div",{class:"row"},[el("img",{src:fotoOf(c),alt:""}),el("div",{class:"t"},[el("b",{text:U(c.marca)+" "+U(c.modelo)+" "+(c.anio||"")}),el("div",{class:"sp",text:price(c)+(c.vendido?" · Vendido":"")+(Number(c.promo)>0?" · Promo":"")+(c.nuevo?" · Nuevo":"")})]),
     el("button",{class:"sec",text:"Editar",on:{click:function(){form={id:c.id,d:JSON.parse(JSON.stringify(c))};delete form.d.id;renderAdmin()}}}),
     el("button",{class:"danger",text:"Eliminar",on:{click:function(){if(confirm("¿Eliminar este auto?"))db.doc("cars/"+c.id).delete().then(reload)}}})]))});
   r.appendChild(p);
